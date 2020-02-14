@@ -3,49 +3,47 @@ import json
 from foundation_node import FoundationNode
 
 #cluster_name = raw_input("enter cluster name: ")
-if os.path.exists('node_config.json'):
+
+config_dict = {}
+def get_node_config():
   fp = open('node_config.json', "r")
   node_config = fp.read()
   fp.close()
-  #print node_config
   node_config = json.loads(node_config)
+  return node_config
   
 
-node_name = node_config["node_name"]
-#cluster = "curl -k https://jarvis.eng.nutanix.com/api/v1/clusters/" + cluster_name
-#result_code = os.system(cluster + ' > cluster_data.txt')
-
-nodes_metadata = []
-for i in range(len(node_config["node_name"].split(","))):
-    node = "curl -k https://jarvis.eng.nutanix.com/api/v1/nodes/" + node_config["node_name"].split(",")[i]
-    node_data = os.system(node + ' > node_data.txt')
-    if os.path.exists('node_data.txt'):
-        fp = open('node_data.txt', "r")
-        output = fp.read()
-        output = json.loads(output)
-        nodes_metadata.append(output)
-        fp.close()
-        os.remove('node_data.txt')
-    #print(output)
+def get_fvm():
+  fp = open('fvm_pool.json', "r")
+  fvm = fp.read()
+  fp.close()
+  fvm = json.loads(fvm)
+  return fvm.get("foundation_ip")[0]
 
 
-#print output
-#print type(output)
-#print output["data"]
-config_dict = {}
+def get_nodes_metadata(node_config):
+  nodes_metadata = []
+  for i in range(len(node_config["node_name"].split(","))):
+      node = "curl -k https://jarvis.eng.nutanix.com/api/v1/nodes/" + node_config["node_name"].split(",")[i]
+      node_data = os.system(node + ' > node_data.txt')
+      if os.path.exists('node_data.txt'):
+	  fp = open('node_data.txt', "r")
+	  output = fp.read()
+	  output = json.loads(output)
+	  nodes_metadata.append(output)
+	  fp.close()
+	  os.remove('node_data.txt')
+  return nodes_metadata
 
 def setup_block_and_node_information(nodes, cvm_memory=12):
     blocks_config = {}
     node = None
     for node in nodes:
-        #print node
         block_id = node.block_id
-        #print block_id
         if block_id not in blocks_config:
             blocks_config[node.block_id] = {}
             blocks_config[node.block_id]["block_id"] = node.block_id
             blocks_config[node.block_id]["nodes"] = []
-        #block_config = blocks_config[node.block_id]
         block_config = blocks_config[node.block_id]
         nodes_config = block_config["nodes"]
 	node_config = {
@@ -64,8 +62,6 @@ def setup_block_and_node_information(nodes, cvm_memory=12):
 	  }
 	nodes_config.append(node_config)
     blocks = blocks_config.values()
-    #print blocks_config
-
     config_dict.update({
       "blocks": blocks,
       "clusters": [],
@@ -131,24 +127,24 @@ def setup_hypervisor_type(hypervisor_type):
       for node in block["nodes"]:
         if not node["hypervisor"]:
           node["hypervisor"] = hypervisor_type
+
+
+fvm = get_fvm()
+node_config = get_node_config()
+node_name = node_config["node_name"]
+nodes_metadata = get_nodes_metadata(node_config)
 nodes = [FoundationNode(metadata = node_data) for node_data in nodes_metadata]
-#print nodes
-#print dir(nodes[0])
-#print nodes[0].block_id
 
 setup_block_and_node_information(nodes)
 cluster_members = [config_dict["blocks"][0]["nodes"][i]["cvm_ip"] for i in range(len(config_dict["blocks"][0]["nodes"]))]
 cluster_name = node_config.get("cluster_name", node_config.get("node_name").split(",")[0])
 setup_cluster_creation(cluster_members=cluster_members, cluster_name=cluster_name)
-nos_name = "nutanix_installer_package-release-euphrates-5.11-stable-db5047ecc43c99e3396e0f115818ad3bf307cc01-x86_64.tar.gz"
+nos_name = node_config.get("nos_name")
 setup_nos_hyp(nos_name=nos_name, hyp_iso="")
-setup_hypervisor_type("kvm")
-#print config_dict
+setup_hypervisor_type(node_config.get("hypervisor","kvm"))
 config_dict = json.dumps(config_dict)
-print json.dumps(config_dict)
-
 image_nodes_curl = 'curl -X POST --header "Content-Type: application/json" --header "Accept: application/json" -d' \
-   + json.dumps(config_dict) + ' "http://10.47.99.231:8000/foundation/image_nodes"'
+   + json.dumps(config_dict) + ' "http://"' + fvm + '":8000/foundation/image_nodes"'
 
 print image_nodes_curl
 os.system(image_nodes_curl + ' > session_id.log')
