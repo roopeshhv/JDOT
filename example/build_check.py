@@ -1,4 +1,6 @@
 # Copyright (c) 2020 Nutanix Inc. All rights reserved.
+#
+# Author: roopesh.hv@nutanix.com
 """
 Fetches the URL for latest smoke passed NOS build
 
@@ -54,26 +56,13 @@ def get_build_url(version, build_type="release"):
           "nos_package": final_build_url.split("/")[-1]}
 
 
-def check_nos_availability(available_images, fname):
+
+def check_nos_availability(available_images, nos_name):
   """
   This routine checks if NOS already present in FVM.
-
-  Args:
-    available_images(str): JSON of response of enumerating NOS
-    fname(str): Name of file to be searched in response
-
-  Returns:
-    (dict): Dict containing the build and metadata url.
-
   """
+  return nos_name in available_images
 
-  for i in available_images:
-    # Foundation will gunzip nos.tar.gz, skip downloading NOS if the .tar
-    # exists.
-    if i in fname or i in fname.strip(".gz"):
-      print "NOS image already present on FVM, Hence will skip download"
-      return True
-  return False
 
 def check_hypervisor_availability(available_images, fname, hyp_type):
   """

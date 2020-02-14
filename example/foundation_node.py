@@ -1,6 +1,5 @@
 # Copyright (c) 2020 Nutanix Inc. All rights reserved.
 #
-#
 """
 A foundationable node abstraction.
 """
