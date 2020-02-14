@@ -1,8 +1,10 @@
+# Copyright (c) 2020 Nutanix Inc. All rights reserved.
+#
+# Author: roopesh.hv@nutanix.com
+
 import os
 import json
 from foundation_node import FoundationNode
-
-#cluster_name = raw_input("enter cluster name: ")
 
 config_dict = {}
 def get_node_config():
@@ -11,7 +13,6 @@ def get_node_config():
   fp.close()
   node_config = json.loads(node_config)
   return node_config
-  
 
 def get_fvm():
   fp = open('fvm_pool.json', "r")
