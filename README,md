@@ -1,0 +1,30 @@
+Background and painpoints
+
+For performing foundation/imaging, employee has to do the following steps:
+Connect the laptop to VPN if not in office
+Open FVM through browser
+Open FVM in CLI and download builds of required AOS and hypervisor version
+Take node details from Racktable-Tool
+Collect IPMI details from IPMI web interface
+
+Average time required to perform the above steps	:  15 mins
+
+Average time required to complete imaging		: 45 mins
+
+Total working hours consumed for an employee on daily basis
+				(Unless there is no issue)	: 1 hour
+        
+        
+ Proposed solution 
+
+Steps to be performed to achieve imaging:
+Send a simple chat message in slack (That’s it!!!). 
+Your task will be triggered.
+ 
+Average time required to perform the above steps	:  1 min
+
+Average time required to complete imaging		: 45 mins (this will be completed in travel time)
+
+Total working hours consumed for an employee on daily basis
+				(Unless there is no issue)	: 0
+Added advantage of the solution				: Task status will be returned in slack. User can start the task again if it is failed. 
