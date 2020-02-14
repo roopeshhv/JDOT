@@ -140,8 +140,7 @@ setup_block_and_node_information(nodes)
 cluster_members = [config_dict["blocks"][0]["nodes"][i]["cvm_ip"] for i in range(len(config_dict["blocks"][0]["nodes"]))]
 cluster_name = node_config.get("cluster_name", node_config.get("node_name").split(",")[0])
 setup_cluster_creation(cluster_members=cluster_members, cluster_name=cluster_name)
-#nos_name = "nutanix_installer_package-release-euphrates-5.11-stable-db5047ecc43c99e3396e0f115818ad3bf307cc01-x86_64.tar.gz"
-nos_name = node_config['nos_name']
+nos_name = "nutanix_installer_package-release-euphrates-5.11-stable-db5047ecc43c99e3396e0f115818ad3bf307cc01-x86_64.tar.gz"
 setup_nos_hyp(nos_name=nos_name, hyp_iso="")
 setup_hypervisor_type("kvm")
 #print config_dict
